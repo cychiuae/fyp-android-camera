@@ -34,7 +34,7 @@ public class MainActivity extends ActionBarActivity implements Camera.PreviewCal
     private Camera mCamera;
 
     private TCPClient tcpClient;
-    private final String ADDRESS = "175.159.120.219";
+    private final String ADDRESS = "202.125.228.170";
     private final int PORT = 8080;
 
     private int FPS = 30;
@@ -114,7 +114,18 @@ public class MainActivity extends ActionBarActivity implements Camera.PreviewCal
             }
         });
 
-        tcpClient = new TCPClient(ADDRESS, PORT);
+        receiveImageView = (ImageView)findViewById(R.id.imageView);
+
+        tcpClient = new TCPClient(ADDRESS, PORT, this);
+    }
+
+    public void setImage(final byte[] data) {
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                receiveImageView.setImageBitmap(BitmapFactory.decodeByteArray(data, 0, data.length));
+            }
+        });
     }
 
     @Override

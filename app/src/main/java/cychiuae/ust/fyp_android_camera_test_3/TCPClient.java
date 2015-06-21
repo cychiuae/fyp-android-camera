@@ -1,6 +1,7 @@
 package cychiuae.ust.fyp_android_camera_test_3;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -13,11 +14,13 @@ public class TCPClient {
     private String address;
     private int port;
     private Socket socket;
-    private Thread sendThread;
+    private boolean running;
+    private MainActivity a;
 
-    public TCPClient(String address, int port) {
+    public TCPClient(String address, int port, MainActivity a) {
         this.address = address;
         this.port = port;
+        this.a = a;
     }
 
     public void setAddress(String address) {
@@ -27,6 +30,7 @@ public class TCPClient {
     public void connect() {
         try {
             socket = new Socket(address, port);
+            running = true;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -66,6 +70,33 @@ public class TCPClient {
                     dOut.flush();
                 } catch (Exception e) {
                     e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    public void receive() {
+        new Thread() {
+            public void run() {
+                while (true) {
+                    while (running) {
+                        try {
+                            DataInputStream dIn = new DataInputStream(socket.getInputStream());
+
+                            int length = dIn.readInt();
+
+                            if (length > 0 && length < 100000) {
+                                byte[] data = new byte[length];
+                                dIn.read(data, 0, data.length);
+
+                                a.setImage(data);
+                            }
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
                 }
             }
         }.start();
