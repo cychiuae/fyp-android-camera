@@ -1,10 +1,13 @@
 package cychiuae.ust.fyp_android_camera_test_3;
 
+import android.util.Log;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Date;
 
 /**
  * Created by yinyinchiu on 21/6/15.
@@ -31,6 +34,7 @@ public class TCPClient {
         try {
             socket = new Socket(address, port);
             running = true;
+            TCPClient.this.receive();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -53,6 +57,23 @@ public class TCPClient {
                     dOut.write(array);
                     dOut.flush();
                 } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    public void sendByte(final byte[] out){
+        new Thread( "Send Thread"){
+            public void run(){
+                try{
+                    DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+                    dOut.writeInt(out.length);
+                    dOut.writeLong(new Date().getTime());
+                    dOut.write(out);
+                    dOut.flush();
+                }
+                catch( Exception e){
                     e.printStackTrace();
                 }
             }
@@ -86,8 +107,12 @@ public class TCPClient {
                             int length = dIn.readInt();
 
                             if (length > 0 && length < 100000) {
+
+                                long time = dIn.readLong();
+                                Log.d("time", "### " + (new Date().getTime() - time));
+
                                 byte[] data = new byte[length];
-                                dIn.read(data, 0, data.length);
+                                dIn.readFully(data, 0, data.length);
 
                                 a.setImage(data);
                             }
