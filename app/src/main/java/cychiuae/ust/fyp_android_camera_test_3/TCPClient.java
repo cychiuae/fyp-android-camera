@@ -1,10 +1,13 @@
 package cychiuae.ust.fyp_android_camera_test_3;
 
+import android.os.Environment;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Date;
@@ -109,12 +112,25 @@ public class TCPClient {
                             if (length > 0 && length < 100000) {
 
                                 long time = dIn.readLong();
-                                Log.d("time", "### " + (new Date().getTime() - time));
+                                long duration = new Date().getTime() - time;
+                                Log.d("time", "### " + duration);
 
                                 byte[] data = new byte[length];
                                 dIn.readFully(data, 0, data.length);
 
                                 a.setImage(data);
+
+                                String filename = "Record";
+                                String fileNameExtension = ".txt";
+                                File sdCard = Environment.getExternalStorageDirectory();
+                                String imageStorageFolder = File.separator + a.getResources().getString(R.string.app_name) + File.separator;
+                                File dir = new File( sdCard.getAbsolutePath() + imageStorageFolder);
+                                dir.mkdir();
+                                File destinationFile = new File(sdCard, imageStorageFolder + filename + fileNameExtension);
+                                FileWriter out = new FileWriter(destinationFile, true);
+                                out.write( String.valueOf(duration) + "\n");
+                                out.flush();
+                                out.close();
                             }
 
                         } catch (IOException e) {

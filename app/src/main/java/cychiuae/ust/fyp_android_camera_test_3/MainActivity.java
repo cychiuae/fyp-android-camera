@@ -31,7 +31,7 @@ public class MainActivity extends ActionBarActivity implements Camera.PreviewCal
     private Camera mCamera;
 
     private TCPClient tcpClient;
-    private final String ADDRESS = "175.159.99.118";
+    private final String ADDRESS = "175.159.107.251";
     private final int PORT = 8080;
 
     private int FPS = 30;
